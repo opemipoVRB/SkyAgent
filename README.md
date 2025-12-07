@@ -1,154 +1,190 @@
-# Agentic AI Meets Multi-Robot Swarms  
-### Episodic LLM Guidance for Decentralised Autonomy under Resource Constraints
+# SkyAgent
+SkyAgent is a small PyGame experiment focused on a single drone flying in a 2D grid world.  
+It is a stripped down version of a larger multi-agent simulator, kept simple for testing ideas around movement, control, and game feel.
 
-## Overview
-This repository provides a **PyGame-based simulation environment** designed to explore the intersection of **Agentic AI** and **multi-robot swarm coordination** under realistic resource limitations.  
-Each drone (agent) operates within a grid world, tasked with locating, picking up, and delivering parcels — all while managing internal resources such as **power** and **network connectivity**.
-
-The environment forms the foundation for investigating whether **episodic, high-level guidance from a Large Language Model (LLM)** can help resource-limited agents coordinate more effectively without continuous central control.
+The game runs in fullscreen and provides a lightweight sandbox for flying, picking up parcels, and completing deliveries.
 
 ---
 
-## Problem
-In multi-agent systems, maintaining coordination across robot swarms is challenging when:
-- Bandwidth is limited,
-- Communication is intermittent or noisy,
-- Agents operate with finite power reserves, and
-- The environment changes dynamically.
+## Features
 
-Fully decentralised approaches are robust to failure but can become inefficient or disorganised.  
-Fully centralised control allows global awareness but introduces bottlenecks and single points of failure.  
-
-This work therefore investigates a **hybrid cognitive architecture**:  
-- Decentralised agents maintain **local autonomy** and **peer prediction**, while  
-- Periodic, **episodic guidance** from an LLM provides system-wide recalibration to improve coordination, **resource allocation**, and **energy efficiency**.
-
----
-
-## Methodology
-
-### Simulation Environment
-The simulation is built in **PyGame**, modelling:
-- A 2D **terrain grid** populated with parcels and a delivery station.
-- **Autonomous drones** with internal resource states:
-  - **Energy (battery)** that depletes based on distance travelled and parcel weight.  
-  - **Network availability**, influencing how often agents can communicate or request LLM guidance.
-
-Agents must **balance task efficiency** (delivering parcels quickly) with **resource conservation**, deciding when to:
-- Return to station for recharge,
-- Conserve bandwidth by operating offline, or
-- Request LLM guidance when uncertainty is high.
-
-### Agent Controllers
-Two controllers are provided:
-- **HumanController** — for direct manual testing.
-- **ComputerController** — a heuristic or rule-based agent.
-  
-A **ControllerSwitcher** allows toggling between human and AI control at runtime (`TAB` key).
-
-### Hybrid Architecture (Planned)
-Two configurations are compared:
-
-#### 1. Baseline Swarm
-- Agents follow fixed heuristics (simple pickup/delivery rules).  
-- Communication and energy management are purely local.
-
-#### 2. Predictive Hybrid Swarm
-- Agents integrate **Small Language Models (SLMs)** for local prediction of peer state.  
-- When energy or prediction confidence drops below a threshold, agents query a **central LLM (Episodic Guidance Module)** for high-level strategic updates.  
-- The LLM provides **coordination cues** such as resource redistribution, movement prioritisation, and energy-saving strategies.
-
----
-
-## Resource Dynamics
-Each agent manages:
-| Resource | Description | Effect |
-|-----------|--------------|--------|
-| **Power** | Depletes with travel distance and carried load | Determines operation time before recharge |
-| **Network** | Represents communication bandwidth or signal strength | Limits ability to share state or query LLM |
-| **Task Load** | Tracks number of parcels handled concurrently | Affects decision fatigue and LLM request frequency |
-
-When power or bandwidth is low, agents **reduce communication frequency** and rely on **peer prediction** instead of central coordination.  
-The LLM is only consulted **episodically**, when uncertainty or energy imbalance rises system-wide.
-
----
-
-## Framework Design
-The long-term goal integrates:
-- **LangChain** and **LangGraph** for orchestrating LLM reasoning, agent dialogue, and episodic state recalibration.  
-- **Local autonomy** during network loss, with predictive continuation until the next episodic update.  
-- **Dynamic adaptation**, allowing the swarm to gracefully degrade and self-stabilize under communication and energy constraints.
-
----
-
-## Evaluation Metrics
-| Metric | Description |
-|---------|-------------|
-| **Mission Success Rate** | % of parcels successfully delivered |
-| **Energy Efficiency** | Energy consumed per successful delivery |
-| **Communication Efficiency** | Messages or bandwidth used per mission |
-| **Adaptability** | Performance under sudden bandwidth/power loss |
-| **Prediction Accuracy** | Correctness of peer-state forecasts during disconnection |
-
----
-
-## Expected Contribution
-This project aims to:
-1. Demonstrate how **episodic LLM guidance** can enhance swarm coordination under resource constraints.  
-2. Present a **simulation framework** to evaluate energy-aware, communication-efficient swarm strategies.  
-3. Provide empirical insights on **graceful degradation** and **autonomous recovery** in distributed multi-agent systems.
-
----
-
-## Repository Structure
-```
-
-src/
-│
-├── game.py                # Main simulation loop (PyGame)
-├── artifacts.py           # Terrain, Drone, Parcel, Station definitions
-├── controllers.py         # Human and AI controller logic
-├── utils.py               # Helper utilities (image scaling, loading)
-└── graphics/              # Drone and parcel sprites
-
-````
-
----
-
-## Controls
-| Action | Key |
-|--------|-----|
-| Move (hold) | Arrow keys or diagonals |
-| Pick up / Drop | `Space` |
-| Switch Controller | `TAB` |
-| Start timed session | `S` |
-| Reset counters | `R` |
-| Quit | `ESC` |
-| Place parcel (mouse) | Left-click |
+- Single controllable drone
+- Fullscreen 2D grid world rendered with PyGame
+- Smooth continuous movement with grid-based logic
+- Parcel pickup and delivery mechanics
+- Optional AI controller with live narration
+- Timed delivery challenge mode
+- Minimal HUD for feedback and debugging
 
 ---
 
 ## Installation
+
 ```bash
-git clone https://github.com/opemipoVRB/MultiAgentSimulator
-cd MultiAgentSimulator/src
+git clone https://github.com/opemipoVRB/SkyAgent.git
+cd SkyAgent
 pip install pygame-ce
 python game.py
 ````
 
+
+## Movement and Controls
+
+SkyAgent is played in fullscreen on a grid world. You control a single drone that moves across grid cells, picks up parcels, and drops them at the delivery station located near the center of the map.
+
+### Basic Movement
+
+* **Move**
+
+  * Hold the **Arrow keys** to move:
+
+    * Up, Down, Left, Right
+    * Diagonal movement is supported (for example, Up + Right)
+  * Movement is continuous while keys are held
+  * The drone snaps logically to grid cells but moves smoothly at high speed
+
+* **Drone Position**
+
+  * The left HUD displays the current grid location as:
+
+    * `Drone cell: (col, row)`
+  * The delivery station occupies a 4×4 area near the center of the map
+
 ---
 
-## Next Steps
+### Interacting With Parcels
 
-* Integrate **energy and bandwidth simulation** into the agent model.
-* Connect the **Episodic Guidance Module** via LangChain/LangGraph.
-* Extend to multi-agent scenarios for cooperative decision-making.
-* Evaluate resource-aware task allocation strategies.
+* **Pick Up Parcel**
+
+  * Move the drone onto a cell containing a parcel
+  * Press **Space**
+  * On successful pickup:
+
+    * The drone sprite switches to its carrying variant
+    * The cell briefly flashes **green**
+    * The HUD displays `carrying: True`
+
+* **Drop Parcel**
+
+  * Move the drone onto a delivery station cell
+  * Press **Space**
+  * On successful delivery:
+
+    * The cell flashes **red**
+    * The parcel is marked as delivered
+    * `Total delivered` and `Session delivered` counters increase
+
+* **Failed Pickup or Drop**
+
+  * If the action is invalid:
+
+    * The cell flashes **yellow**
+    * No delivery is counted
+
+* **Spawn Parcel (Mouse)**
+
+  * Left-click on any non-station cell to spawn a parcel
 
 ---
 
-## Citation
-> **Opemipo Durodola (2025)**
-> *Agentic AI Meets Multi-Robot Swarms: Episodic LLM Guidance for Decentralised Autonomy under Resource Constraints*
-> Simulation and prototype research framework, 2025.
+### Timed Delivery Session
+
+You can play freely or start a timed delivery challenge.
+
+* **Start Timed Session**
+
+  * Press **S**
+  * Starts a 60-second delivery session
+  * Resets the `Session delivered` counter
+  * Remaining time is shown in the HUD as `Session time left`
+
+* **End of Session**
+
+  * The session ends automatically when time runs out
+  * You can still move, but further deliveries are not counted
+
+* **Reset Counters**
+
+  * Press **R**
+  * Resets:
+
+    * Total deliveries
+    * Session deliveries
+    * Session timer state
+
+---
+
+### Controllers
+
+The drone can be controlled manually or by an AI.
+
+* **Switch Controller**
+
+  * Press **TAB**
+  * Toggles between:
+
+    * `HumanAgentController`
+    * `AIAgentController`
+  * The active controller name is shown in the HUD
+
+* **AI Narration Panel**
+
+  * When AI control is active, a narration box may appear on the right
+  * Displays what the AI believes it is doing or planning
+  * Useful for observing and debugging AI behavior
+
+---
+
+### HUD and Feedback
+
+A translucent HUD panel on the left displays:
+
+* Active controller
+* Drone grid position
+* Whether the drone is carrying a parcel
+* Battery level (if implemented)
+* Total and session deliveries
+* Remaining session time
+* Number of lost drones and last known location
+* Key reminders
+
+Color feedback:
+
+* **Green** → successful pickup
+* **Red** → successful delivery
+* **Yellow** → failed action
+
+---
+
+### Global Controls
+
+| Action              | Key               |
+| ------------------- | ----------------- |
+| Move                | Arrow keys (hold) |
+| Pick up / Drop      | Space             |
+| Switch controller   | TAB               |
+| Start timed session | S                 |
+| Reset counters      | R                 |
+| Quit                | ESC               |
+
+---
+
+### Startup Flow
+
+* The game starts with a splash screen
+
+  * Press any key or mouse button to continue
+* A setup screen follows:
+
+  * Choose how many parcels to spawn
+  * Use **Up / Down** or type digits directly
+  * Press **Enter** to start
+  * Press **ESC** to quit
+
+---
+
+## Notes
+
+SkyAgent is intentionally small and modular. It is designed as a playable sandbox rather than a polished game or research framework, making it easy to extend, refactor, or experiment with new mechanics.
+
 ---
